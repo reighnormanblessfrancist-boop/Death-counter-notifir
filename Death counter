@@ -1,0 +1,60 @@
+-- Death Counter Notifier ESP
+-- LocalScript in StarterPlayerScripts
+
+local Players = game:GetService("Players")
+local StarterGui = game:GetService("StarterGui")
+
+-- Utility: notify
+local function notify(text)
+    StarterGui:SetCore("SendNotification", {
+        Title = "Ability Notifier";
+        Text = text;
+        Duration = 4;
+    })
+end
+
+-- Utility: create ESP tag
+local function createTag(player, text)
+    if not player.Character then return end
+    local head = player.Character:FindFirstChild("Head")
+    if not head then return end
+
+    -- Remove old
+    if head:FindFirstChild("AbilityTag") then
+        head.AbilityTag:Destroy()
+    end
+
+    local billboard = Instance.new("BillboardGui")
+    billboard.Name = "AbilityTag"
+    billboard.Size = UDim2.new(0, 150, 0, 50)
+    billboard.StudsOffset = Vector3.new(0, 3, 0)
+    billboard.AlwaysOnTop = true
+    billboard.Parent = head
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, 0, 1, 0)
+    label.BackgroundTransparency = 1
+    label.TextColor3 = Color3.fromRGB(255, 50, 50)
+    label.TextStrokeTransparency = 0.2
+    label.Font = Enum.Font.GothamBold
+    label.TextScaled = true
+    label.Text = text
+    label.Parent = billboard
+end
+
+-- Detect Death Counter usage
+-- NOTE: you must replace "DeathCounterRemote" with the actual RemoteEvent name from TSB
+local function onDeathCounter(player)
+    notify(player.Name .. " has used Death Counter!")
+    createTag(player, "Death Counter!!")
+    task.delay(5, function()
+        if player.Character and player.Character:FindFirstChild("Head") then
+            local tag = player.Character.Head:FindFirstChild("AbilityTag")
+            if tag then tag:Destroy() end
+        end
+    end)
+end
+
+-- Example hook (replace this part with the actual event in TSB)
+-- For example, if the game fires a RemoteEvent when ability is used:
+-- game.ReplicatedStorage.Remotes.DeathCounter.OnClientEvent:Connect(function(plr) onDeathCounter(plr) end)
